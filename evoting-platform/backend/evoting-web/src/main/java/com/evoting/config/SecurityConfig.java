@@ -73,7 +73,7 @@ public class SecurityConfig {
             // Security headers
             .headers(headers -> headers
                 .contentSecurityPolicy(csp -> csp
-                    .policyDirectives("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; object-src 'none'; frame-ancestors 'none'")
+                    .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' data: https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'")
                 )
                 .referrerPolicy(referrer -> referrer
                     .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
@@ -86,7 +86,16 @@ public class SecurityConfig {
             )
             // Authorization rules — deny-by-default
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints
+                // Allow internal JSP forward and error dispatches (Spring Security 6 requirement)
+                .dispatcherTypeMatchers(
+                    jakarta.servlet.DispatcherType.FORWARD,
+                    jakarta.servlet.DispatcherType.ERROR,
+                    jakarta.servlet.DispatcherType.INCLUDE
+                ).permitAll()
+                // Web UI views & static assets
+                .requestMatchers("/", "/elections", "/elections/**", "/auth/**", "/ballot/**", "/audit-portal", "/audit-portal/**").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico", "/error", "/WEB-INF/**").permitAll()
+                // Public REST endpoints
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/mfa/verify").permitAll()
@@ -96,20 +105,18 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/verify/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/audit/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/receipts/**").permitAll()
-                // Swagger / OpenAPI (disable in production)
+                // Swagger / OpenAPI
                 .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
-                // Actuator — secured
+                // Actuator — health is public
                 .requestMatchers("/actuator/health").permitAll()
                 .requestMatchers("/actuator/**").hasRole("SYSTEM_OPERATOR")
-                // JSP admin views
+                // Admin views & operations
                 .requestMatchers("/admin/**").hasAnyRole("ELECTION_ADMIN", "SYSTEM_OPERATOR")
-                .requestMatchers("/audit-portal/**").permitAll()
-                // Voter operations
+                .requestMatchers("/api/v1/admin/**").hasAnyRole("ELECTION_ADMIN", "SYSTEM_OPERATOR")
+                // Voter operations (authenticated)
                 .requestMatchers("/api/v1/credentials/**").hasAnyRole("VOTER", "ELIGIBILITY_AUTHORITY")
                 .requestMatchers(HttpMethod.POST, "/api/v1/ballots/**").hasRole("VOTER")
                 .requestMatchers(HttpMethod.GET, "/api/v1/ballots/**").hasRole("VOTER")
-                // Admin operations
-                .requestMatchers("/api/v1/admin/**").hasAnyRole("ELECTION_ADMIN", "SYSTEM_OPERATOR")
                 // Everything else — deny
                 .anyRequest().authenticated()
             )

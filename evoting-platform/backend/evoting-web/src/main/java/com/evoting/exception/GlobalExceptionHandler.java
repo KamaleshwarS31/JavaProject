@@ -12,6 +12,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
  * Centralized exception handler.
  * SECURITY: Never exposes stack traces, SQL, internal details, or sensitive data to clients.
  */
+@Hidden
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
