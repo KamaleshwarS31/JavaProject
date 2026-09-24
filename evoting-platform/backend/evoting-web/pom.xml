@@ -16,7 +16,7 @@
     <name>E-Voting Web — Main Spring Boot Application</name>
 
     <dependencies>
-        <!-- All internal modules -->
+        <!-- Internal modules -->
         <dependency>
             <groupId>com.evoting</groupId>
             <artifactId>evoting-core</artifactId>
@@ -24,26 +24,6 @@
         <dependency>
             <groupId>com.evoting</groupId>
             <artifactId>evoting-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.evoting</groupId>
-            <artifactId>evoting-eligibility</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.evoting</groupId>
-            <artifactId>evoting-ballot</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.evoting</groupId>
-            <artifactId>evoting-blockchain</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.evoting</groupId>
-            <artifactId>evoting-audit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.evoting</groupId>
-            <artifactId>evoting-tally</artifactId>
         </dependency>
 
         <!-- Spring Boot starters -->
@@ -127,7 +107,7 @@
         <!-- Rate Limiting -->
         <dependency>
             <groupId>com.bucket4j</groupId>
-            <artifactId>bucket4j-core</artifactId>
+            <artifactId>bucket4j_jdk17-core</artifactId>
         </dependency>
 
         <!-- BouncyCastle -->

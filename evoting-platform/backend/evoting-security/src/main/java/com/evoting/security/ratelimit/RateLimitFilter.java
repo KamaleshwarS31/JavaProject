@@ -1,7 +1,7 @@
 package com.evoting.security.ratelimit;
 
-import com.bucket4j.Bandwidth;
-import com.bucket4j.Bucket;
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
