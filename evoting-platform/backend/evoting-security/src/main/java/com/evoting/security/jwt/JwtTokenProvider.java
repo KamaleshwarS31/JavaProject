@@ -28,9 +28,24 @@ public class JwtTokenProvider {
     private final long expirationMs;
 
     public JwtTokenProvider(
-            @Value("${evoting.jwt.secret}") String jwtSecret,
+            @Value("${evoting.jwt.secret:default-secret-change-in-production-must-be-long}") String jwtSecret,
             @Value("${evoting.jwt.expiration-minutes:15}") long expirationMinutes) {
-        this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        byte[] keyBytes;
+        try {
+            keyBytes = Decoders.BASE64.decode(jwtSecret);
+            if (keyBytes.length < 32) {
+                keyBytes = java.security.MessageDigest.getInstance("SHA-512")
+                    .digest(jwtSecret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            }
+        } catch (Exception e) {
+            try {
+                keyBytes = java.security.MessageDigest.getInstance("SHA-512")
+                    .digest(jwtSecret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            } catch (java.security.NoSuchAlgorithmException ex) {
+                throw new IllegalStateException("SHA-512 algorithm not available", ex);
+            }
+        }
+        this.secretKey = Keys.hmacShaKeyFor(keyBytes);
         this.expirationMs = expirationMinutes * 60 * 1000L;
     }
 

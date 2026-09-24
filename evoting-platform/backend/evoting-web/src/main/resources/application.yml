@@ -99,7 +99,7 @@ server:
 evoting:
   # JWT Configuration — secret from environment ONLY
   jwt:
-    secret: ${JWT_SECRET}
+    secret: ${JWT_SECRET:4290ad38-838b-47ef-ab56-73ebcda9d142-default-change-in-production}
     expiration-minutes: ${JWT_EXPIRATION_MINUTES:15}
     refresh-expiration-hours: ${JWT_REFRESH_EXPIRATION_HOURS:24}
 
