@@ -1,0 +1,83 @@
+# ============================================================
+# E-Voting Platform — Git Ignore
+# ============================================================
+
+# ---- Maven build output ----
+target/
+**/target/
+*.class
+*.jar
+!**/src/main/**/*.jar
+*.war
+*.ear
+
+# ---- IDE files ----
+.idea/
+*.iml
+*.iws
+*.ipr
+.eclipse/
+.project
+.classpath
+.settings/
+*.factorypath
+.vscode/
+*.code-workspace
+
+# ---- Environment / Secrets — NEVER COMMIT ----
+.env
+*.env
+.env.local
+.env.production
+secrets/
+vault/
+*.key
+*.pem
+*.p12
+*.jks
+*.pkcs12
+
+# ---- Supabase / Database credentials ----
+application-local.yml
+application-local.yaml
+application-production.yml
+application-production.yaml
+
+# ---- Hyperledger Fabric private materials ----
+blockchain/network/organizations/peerOrganizations/*/users/*/msp/keystore/
+blockchain/network/organizations/ordererOrganizations/*/users/*/msp/keystore/
+blockchain/network/organizations/fabric-ca/*/fabric-ca-server/
+blockchain/network/system-genesis-block/
+
+# ---- Log files ----
+*.log
+logs/
+**/logs/
+
+# ---- OS artifacts ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Node / NPM (if any frontend tooling) ----
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ---- Test reports (generated) ----
+**/surefire-reports/
+**/failsafe-reports/
+**/jacoco.exec
+**/site/
+
+# ---- Docker ----
+docker-compose.override.yml
+
+# ---- NEVER commit these ----
+# application-local.yml  (already listed above)
+# .env                   (already listed above)
+# Any file named: *_secret*, *_private*, *credentials*
+*secret*
+*private_key*
+*credentials*
