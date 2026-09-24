@@ -1,0 +1,88 @@
+# ============================================================
+# E-Voting Platform — Docker Compose
+# For local development and integration testing only.
+# Production: Use Kubernetes or cloud-managed services.
+# ============================================================
+# NOTE: Docker not available on dev machine.
+#       This file is provided for CI/CD reference only.
+# ============================================================
+version: '3.9'
+
+services:
+  # Spring Boot Application
+  evoting-app:
+    build:
+      context: .
+      dockerfile: evoting-platform/backend/evoting-web/Dockerfile
+    image: evoting-platform:latest
+    container_name: evoting-app
+    ports:
+      - "8080:8080"
+    environment:
+      # All secrets via environment variables
+      SUPABASE_DB_URL: ${SUPABASE_DB_URL}
+      SUPABASE_DB_USER: ${SUPABASE_DB_USER}
+      SUPABASE_DB_PASSWORD: ${SUPABASE_DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      FABRIC_PEER_ENDPOINT: ${FABRIC_PEER_ENDPOINT:-localhost:7051}
+      FABRIC_CHANNEL_NAME: ${FABRIC_CHANNEL_NAME:-evoting-channel}
+      FABRIC_CHAINCODE_NAME: ${FABRIC_CHAINCODE_NAME:-evoting}
+      EVOTING_CORS_ALLOWED_ORIGINS: ${EVOTING_CORS_ALLOWED_ORIGINS:-http://localhost:8080}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - evoting-network
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  # Hyperledger Fabric Peer (dev mode)
+  fabric-peer:
+    image: hyperledger/fabric-peer:2.5
+    container_name: fabric-peer
+    environment:
+      CORE_PEER_ID: peer0.evoting.example.com
+      CORE_PEER_ADDRESS: peer0.evoting.example.com:7051
+      CORE_PEER_LISTENADDRESS: 0.0.0.0:7051
+      CORE_PEER_GOSSIP_BOOTSTRAP: peer0.evoting.example.com:7051
+      CORE_PEER_GOSSIP_EXTERNALENDPOINT: peer0.evoting.example.com:7051
+      CORE_PEER_LOCALMSPID: EVotingMSP
+      CORE_PEER_MSPCONFIGPATH: /etc/hyperledger/fabric/msp
+      CORE_CHAINCODE_MODE: dev
+      FABRIC_LOGGING_SPEC: INFO
+    ports:
+      - "7051:7051"
+    volumes:
+      - ./evoting-platform/blockchain/network/crypto-config/peerOrganizations:/etc/hyperledger/fabric/msp:ro
+    networks:
+      - evoting-network
+    restart: unless-stopped
+
+  # Fabric Orderer
+  fabric-orderer:
+    image: hyperledger/fabric-orderer:2.5
+    container_name: fabric-orderer
+    environment:
+      ORDERER_GENERAL_LISTENADDRESS: 0.0.0.0
+      ORDERER_GENERAL_LISTENPORT: 7050
+      ORDERER_GENERAL_LOCALMSPID: OrdererMSP
+      ORDERER_GENERAL_BOOTSTRAPMETHOD: none
+      FABRIC_LOGGING_SPEC: INFO
+      ORDERER_CHANNELPARTICIPATION_ENABLED: 'true'
+      ORDERER_ADMIN_LISTENADDRESS: 0.0.0.0:9443
+    ports:
+      - "7050:7050"
+      - "9443:9443"
+    networks:
+      - evoting-network
+    restart: unless-stopped
+
+networks:
+  evoting-network:
+    driver: bridge
+    name: evoting-network

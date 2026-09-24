@@ -1,0 +1,50 @@
+/* E-Voting Platform — Custom Styles */
+/* WCAG 2.2 AA compliant — minimum 4.5:1 contrast ratios */
+
+:root {
+    --evoting-primary: #0d6efd;
+    --evoting-success: #198754;
+    --evoting-focus-outline: 3px solid #fd7e14;
+}
+
+/* Accessibility: enhanced focus indicators (WCAG 2.4.11) */
+:focus-visible {
+    outline: var(--evoting-focus-outline);
+    outline-offset: 2px;
+}
+
+/* Skip link */
+.visually-hidden-focusable:focus {
+    z-index: 9999;
+    top: 0.5rem;
+    left: 0.5rem;
+}
+
+/* Candidate option hover */
+.candidate-option:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+    border-color: var(--evoting-primary) !important;
+    transition: border-color 0.15s ease;
+}
+
+.candidate-option input:checked + label {
+    font-weight: 600;
+    color: var(--evoting-primary);
+}
+
+/* Receipt card */
+.receipt-card {
+    border-left: 4px solid var(--evoting-success);
+}
+
+/* Status badges */
+.badge-ACTIVE    { background-color: var(--evoting-success); }
+.badge-DRAFT     { background-color: #6c757d; }
+.badge-FINALIZED { background-color: #212529; }
+
+/* Print styles for receipt */
+@media print {
+    nav, footer, button, .btn, .alert-warning { display: none !important; }
+    .card { box-shadow: none !important; border: 1px solid #dee2e6 !important; }
+}
